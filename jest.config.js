@@ -16,6 +16,7 @@ const config = {
   coverageReporters: ['text', 'lcov'],
   clearMocks: true,
   setupFiles: ['dotenv/config'],
+  maxWorkers: 1,
 };
 
 module.exports = config;

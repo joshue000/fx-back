@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { TradeOrderService } from '../../application/trade-order/trade-order.service';
-import { CreateTradeOrderInput } from '../../domain/trade-order';
+import { CreateTradeOrderInput, findAllTradeOrdersSchema } from '../../domain/trade-order';
 
 export class TradeOrderController {
   constructor(private readonly service: TradeOrderService) {}
@@ -11,8 +11,9 @@ export class TradeOrderController {
     res.status(StatusCodes.CREATED).json(order);
   };
 
-  findAll = async (_req: Request, res: Response): Promise<void> => {
-    const orders = await this.service.findAll();
-    res.status(StatusCodes.OK).json(orders);
+  findAll = async (req: Request, res: Response): Promise<void> => {
+    const query = findAllTradeOrdersSchema.parse(req.query);
+    const result = await this.service.findAll(query);
+    res.status(StatusCodes.OK).json(result);
   };
 }

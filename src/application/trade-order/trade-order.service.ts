@@ -1,4 +1,10 @@
-import { CreateTradeOrderInput, TradeOrder, TradeOrderRepository } from '../../domain/trade-order';
+import { PaginatedResponse } from '../../common/pagination';
+import {
+  CreateTradeOrderInput,
+  FindAllTradeOrdersQuery,
+  TradeOrder,
+  TradeOrderRepository,
+} from '../../domain/trade-order';
 
 export class TradeOrderService {
   constructor(private readonly repository: TradeOrderRepository) {}
@@ -7,7 +13,7 @@ export class TradeOrderService {
     return this.repository.create(input);
   }
 
-  async findAll(): Promise<TradeOrder[]> {
-    return this.repository.findAll();
+  async findAll(query: FindAllTradeOrdersQuery): Promise<PaginatedResponse<TradeOrder>> {
+    return this.repository.findAll(query);
   }
 }

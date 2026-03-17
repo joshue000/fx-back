@@ -1,5 +1,6 @@
 import { TradeOrder as PrismaTradeOrder } from '@prisma/client';
 import { prisma } from '../../config/database';
+import { PaginatedResponse, PaginationQuery } from '../../common/pagination';
 import { CreateTradeOrderDto, TradeOrder, TradeOrderRepository } from '../../domain/trade-order';
 
 export class PrismaTradeOrderRepository implements TradeOrderRepository {
@@ -18,12 +19,28 @@ export class PrismaTradeOrderRepository implements TradeOrderRepository {
     return this.serialize(order);
   }
 
-  async findAll(): Promise<TradeOrder[]> {
-    const orders = await prisma.tradeOrder.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(query: PaginationQuery): Promise<PaginatedResponse<TradeOrder>> {
+    const { page, limit } = query;
+    const skip = (page - 1) * limit;
 
-    return orders.map((order) => this.serialize(order));
+    const [orders, total] = await Promise.all([
+      prisma.tradeOrder.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.tradeOrder.count(),
+    ]);
+
+    return {
+      data: orders.map((order) => this.serialize(order)),
+      metadata: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   private serialize(order: PrismaTradeOrder): TradeOrder {

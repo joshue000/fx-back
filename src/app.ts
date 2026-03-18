@@ -3,13 +3,18 @@ import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import { rateLimit } from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env';
+import { swaggerSpec } from './config/swagger';
 import { apiRouter } from './routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { notFoundMiddleware } from './middleware/notFound.middleware';
 
 export function createApp(): Application {
   const app = express();
+
+  // Swagger UI — mounted before helmet so its CSP is not blocked
+  app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   // Security headers
   app.use(helmet());

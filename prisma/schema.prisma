@@ -32,6 +32,7 @@ model TradeOrder {
   price     Decimal     @db.Decimal(18, 5)
   status    OrderStatus @default(open)
   pair      String
+  deleted   Boolean     @default(false)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 

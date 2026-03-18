@@ -14,6 +14,7 @@ const makeOrder = (overrides: Partial<TradeOrder> = {}): TradeOrder => ({
   price: '42000.12345',
   status: OrderStatus.open,
   pair: 'BTCUSD',
+  deleted: false,
   createdAt: new Date('2024-01-01T00:00:00Z'),
   updatedAt: new Date('2024-01-01T00:00:00Z'),
   ...overrides,
@@ -32,6 +33,9 @@ const makePaginatedResponse = (orders: TradeOrder[]): PaginatedResponse<TradeOrd
 const mockRepository: jest.Mocked<TradeOrderRepository> = {
   create: jest.fn(),
   findAll: jest.fn(),
+  findById: jest.fn(),
+  update: jest.fn(),
+  softDelete: jest.fn(),
 };
 
 describe('TradeOrderService', () => {

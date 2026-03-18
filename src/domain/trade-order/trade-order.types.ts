@@ -10,6 +10,7 @@ export interface TradeOrder {
   price: string;
   status: OrderStatus;
   pair: string;
+  deleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

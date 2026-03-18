@@ -46,7 +46,15 @@ docker compose up -d
 npm run prisma:migrate
 ```
 
-### 5. Start development server
+### 5. Seed the database (optional)
+
+```bash
+npm run prisma:seed
+```
+
+Inserts 25 sample trade orders across 5 currency pairs (BTCUSD, ETHUSD, EURUSD, GBPUSD, USDJPY) with a mix of sides, types, and statuses. Running the command again resets and re-seeds from scratch.
+
+### 6. Start development server
 
 ```bash
 npm run dev
@@ -67,6 +75,7 @@ The API will be available at `http://localhost:3000`.
 | `npm run lint`            | Lint source files                  |
 | `npm run lint:fix`        | Lint and auto-fix                  |
 | `npm run prisma:migrate`  | Run DB migrations (dev)            |
+| `npm run prisma:seed`     | Seed the database with sample data |
 | `npm run prisma:studio`   | Open Prisma Studio                 |
 
 ## API Endpoints
@@ -90,7 +99,9 @@ src/
 ├── app.ts          # Express app factory
 └── server.ts       # entry point
 prisma/
-└── schema.prisma   # database schema
+├── schema.prisma   # database schema
+├── seed.ts         # seed script (25 sample orders)
+└── migrations/     # migration history
 tests/
 ├── unit/           # unit tests
 └── integration/    # integration tests

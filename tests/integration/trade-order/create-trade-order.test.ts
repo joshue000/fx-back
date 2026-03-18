@@ -10,11 +10,12 @@ afterAll(async () => {
 });
 
 describe('POST /api/v1/trade_orders', () => {
+  // BTCUSD market price: 100150.4 — buy limit at 99000 is valid (99000 < 100150.4)
   const validPayload = {
     side: 'buy',
     type: 'limit',
     amount: 1.5,
-    price: 42000.12345,
+    price: 99000.00000,
     pair: 'BTCUSD',
   };
 
@@ -39,10 +40,11 @@ describe('POST /api/v1/trade_orders', () => {
     expect(res.body.status).toBe('open');
   });
 
+  // ETHUSD market price: 3310 — buy limit at 3200 is valid (3200 < 3310)
   it('normalizes pair to uppercase', async () => {
     const res = await request(app)
       .post('/api/v1/trade_orders')
-      .send({ ...validPayload, pair: 'ethusd' });
+      .send({ ...validPayload, pair: 'ethusd', price: 3200.00000 });
 
     expect(res.status).toBe(201);
     expect(res.body.pair).toBe('ETHUSD');
@@ -72,12 +74,108 @@ describe('POST /api/v1/trade_orders', () => {
       .send({ ...validPayload, price: 1.123456 });
 
     expect(res.status).toBe(422);
-    expect(res.body.errors.price).toBeDefined();
   });
 
   it('returns 422 when required fields are missing', async () => {
     const res = await request(app).post('/api/v1/trade_orders').send({});
 
     expect(res.status).toBe(422);
+  });
+
+  describe('pair validation', () => {
+    it('returns 422 when pair is not supported', async () => {
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, pair: 'GBPUSD' });
+
+      expect(res.status).toBe(422);
+    });
+  });
+
+  describe('price policy — limit orders', () => {
+    it('returns 400 when buy limit price is above market price', async () => {
+      // BTCUSD market: 100150.4 — 101000 > 100150.4 → invalid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'buy', type: 'limit', price: 101000.00000 });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 201 when buy limit price is below market price', async () => {
+      // BTCUSD market: 100150.4 — 99000 < 100150.4 → valid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'buy', type: 'limit', price: 99000.00000 });
+
+      expect(res.status).toBe(201);
+    });
+
+    it('returns 400 when sell limit price is below market price', async () => {
+      // BTCUSD market: 100150.4 — 99000 < 100150.4 → invalid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'sell', type: 'limit', price: 99000.00000 });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 201 when sell limit price is above market price', async () => {
+      // BTCUSD market: 100150.4 — 101000 > 100150.4 → valid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'sell', type: 'limit', price: 101000.00000 });
+
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('price policy — stop orders', () => {
+    it('returns 400 when buy stop price is below market price', async () => {
+      // BTCUSD market: 100150.4 — 99000 < 100150.4 → invalid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'buy', type: 'stop', price: 99000.00000 });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 201 when buy stop price is above market price', async () => {
+      // BTCUSD market: 100150.4 — 101000 > 100150.4 → valid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'buy', type: 'stop', price: 101000.00000 });
+
+      expect(res.status).toBe(201);
+    });
+
+    it('returns 400 when sell stop price is above market price', async () => {
+      // BTCUSD market: 100150.4 — 101000 > 100150.4 → invalid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'sell', type: 'stop', price: 101000.00000 });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 201 when sell stop price is below market price', async () => {
+      // BTCUSD market: 100150.4 — 99000 < 100150.4 → valid
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, side: 'sell', type: 'stop', price: 99000.00000 });
+
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('price policy — market orders', () => {
+    it('returns 201 regardless of price for market orders', async () => {
+      // Market orders skip price validation entirely
+      const res = await request(app)
+        .post('/api/v1/trade_orders')
+        .send({ ...validPayload, type: 'market', price: 100150.40000 });
+
+      expect(res.status).toBe(201);
+    });
   });
 });

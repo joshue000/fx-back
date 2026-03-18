@@ -15,7 +15,7 @@ const devFormat = combine(
 const prodFormat = combine(timestamp(), json());
 
 export const logger = createLogger({
-  level: env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: env.NODE_ENV === 'production' ? 'http' : 'debug',
   format: env.NODE_ENV === 'production' ? prodFormat : devFormat,
   transports: [new transports.Console()],
 });

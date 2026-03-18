@@ -7,6 +7,9 @@ import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env';
 import { swaggerSpec } from './config/swagger';
 import { apiRouter } from './routes';
+import { metricsRouter } from './routes/metrics.route';
+import { requestLogger } from './middleware/request-logger.middleware';
+import { metricsMiddleware } from './middleware/metrics.middleware';
 import { errorMiddleware } from './middleware/error.middleware';
 import { notFoundMiddleware } from './middleware/notFound.middleware';
 
@@ -15,6 +18,9 @@ export function createApp(): Application {
 
   // Swagger UI — mounted before helmet so its CSP is not blocked
   app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+  // Metrics endpoint — mounted before helmet (infrastructure route, no CSP needed)
+  app.use('/metrics', metricsRouter);
 
   // Security headers
   app.use(helmet());
@@ -38,6 +44,12 @@ export function createApp(): Application {
       legacyHeaders: false,
     }),
   );
+
+  // HTTP request logging
+  app.use(requestLogger);
+
+  // HTTP metrics collection
+  app.use(metricsMiddleware);
 
   // Routes
   app.use('/api/v1', apiRouter);

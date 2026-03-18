@@ -36,7 +36,15 @@ cp .env.example .env
 # Edit .env if needed — defaults work out of the box
 ```
 
-### 2. Start the stack
+### 2. Grant execute permission to the scripts (first time only)
+
+Run this from the project root directory:
+
+```bash
+chmod +x scripts/start.sh scripts/stop.sh
+```
+
+### 3. Start the stack
 
 ```bash
 ./scripts/start.sh
@@ -48,7 +56,7 @@ This will:
 - Run database migrations automatically
 - Seed the database with 25 sample orders
 
-### 3. Stop the stack
+### 4. Stop the stack
 
 ```bash
 ./scripts/stop.sh

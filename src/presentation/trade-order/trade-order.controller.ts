@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 import { StatusCodes } from 'http-status-codes';
 import { TradeOrderService } from '../../application/trade-order/trade-order.service';
 import {
@@ -12,7 +13,7 @@ type IdParams = { id: string };
 export class TradeOrderController {
   constructor(private readonly service: TradeOrderService) {}
 
-  create = async (req: Request<Record<string, string>, unknown, CreateTradeOrderInput>, res: Response): Promise<void> => {
+  create = async (req: Request<ParamsDictionary, unknown, CreateTradeOrderInput>, res: Response): Promise<void> => {
     const order = await this.service.create(req.body);
     res.status(StatusCodes.CREATED).json(order);
   };

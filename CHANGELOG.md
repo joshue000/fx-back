@@ -7,6 +7,19 @@ Versioning follows `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [0.0.8] - 2026-03-19
+
+### Changed
+
+- Graceful shutdown now enforces a 10-second timeout; forces `process.exit(1)` if connections do not close in time
+- `TradeOrderController` handlers typed with `Request<Params, ResBody, ReqBody>` generic — eliminates all `as` casts on `req.body` and `req.params`
+
+### Fixed
+
+- `GET /api/v1/trade_orders` now correctly rejects `limit` values above 100 with a 422 response
+
+---
+
 ## [0.0.7] - 2026-03-18
 
 ### Changed

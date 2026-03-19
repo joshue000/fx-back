@@ -15,6 +15,25 @@ jobs:
   test:
     name: Lint & Test
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fxreplaychallenge
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fxreplaychallenge?schema=public
+
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +43,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npx prisma migrate deploy
       - run: npm run lint
       - run: npm run test
 

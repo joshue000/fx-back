@@ -1,6 +1,6 @@
 {
   "name": "fxreplaychallenge",
-  "version": "0.0.7",
+  "version": "0.0.6",
   "description": "Node.js REST API with Express, Prisma, and PostgreSQL",
   "main": "dist/server.js",
   "engines": {

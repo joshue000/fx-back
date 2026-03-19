@@ -7,6 +7,14 @@ Versioning follows `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [0.0.7] - 2026-03-18
+
+### Changed
+
+- `GET /api/v1/health` response now includes a `version` field sourced from `package.json`
+
+---
+
 ## [0.0.6] - 2026-03-18
 
 ### Added

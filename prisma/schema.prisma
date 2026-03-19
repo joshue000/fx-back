@@ -37,4 +37,7 @@ model TradeOrder {
   updatedAt DateTime    @updatedAt
 
   @@map("trade_order")
+
+  @@index([deleted, createdAt(sort: Desc)])
+  @@index([pair])
 }

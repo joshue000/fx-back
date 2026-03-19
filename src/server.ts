@@ -14,9 +14,20 @@ async function bootstrap(): Promise<void> {
     logger.info(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
   });
 
-  const shutdown = async (signal: string): Promise<void> => {
+  const SHUTDOWN_TIMEOUT_MS = 10_000;
+
+  const shutdown = (signal: string): void => {
     logger.info(`${signal} received — shutting down gracefully`);
+
+    const timer = setTimeout(() => {
+      logger.error('Graceful shutdown timed out — forcing exit');
+      process.exit(1);
+    }, SHUTDOWN_TIMEOUT_MS);
+
+    timer.unref();
+
     server.close(async () => {
+      clearTimeout(timer);
       await prisma.$disconnect();
       logger.info('Database disconnected');
       process.exit(0);

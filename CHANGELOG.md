@@ -7,6 +7,11 @@ Versioning follows `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [0.0.6] - 2026-03-18
+
+### Added
+- `.github/workflows/ci-cd.yml` — GitHub Actions pipeline: `test` on every PR; `test → build-and-push → deploy` on push to `master`; image published to GHCR; deploy via SSH using `appleboy/ssh-action`
+
 ## [0.0.5] - 2026-03-17
 
 ### Changed

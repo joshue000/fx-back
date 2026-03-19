@@ -6,7 +6,7 @@ import { SUPPORTED_PAIRS } from './trade-order.constants';
 const AMOUNT_DECIMALS = 2;
 const PRICE_DECIMALS = 5;
 
-const decimalPrecision = (maxDecimals: number) =>
+const decimalPrecision = (maxDecimals: number): z.ZodEffects<z.ZodNumber, number, number> =>
   z
     .number()
     .positive()
